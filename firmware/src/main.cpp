@@ -117,6 +117,44 @@ void setupButtons() {
     attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
 }
 
+// Draws a friendly robot face (🤖) on the currently active screen using
+// graphics primitives - replaces the old embedded logo photo on the boot screen.
+void drawBootRobot(ScreenManager *sm) {
+    const uint32_t HEAD = TFT_LIGHTGREY;
+    const uint32_t DARK = TFT_DARKGREY;
+    const uint32_t EYE = TFT_CYAN;
+
+    // Antenna
+    sm->fillRect(117, 34, 6, 20, DARK);
+    sm->fillCircle(120, 31, 7, TFT_RED);
+
+    // Ears / side bolts (drawn first so the head overlaps their inner edge)
+    sm->fillRect(50, 96, 12, 32, DARK);
+    sm->fillRect(178, 96, 12, 32, DARK);
+
+    // Head - a rounded square built from two rects plus four corner circles
+    sm->fillRect(76, 52, 88, 120, HEAD);
+    sm->fillRect(60, 68, 120, 88, HEAD);
+    sm->fillCircle(76, 68, 16, HEAD);
+    sm->fillCircle(164, 68, 16, HEAD);
+    sm->fillCircle(76, 156, 16, HEAD);
+    sm->fillCircle(164, 156, 16, HEAD);
+
+    // Eyes (glowing cyan with pupil + highlight)
+    sm->fillCircle(97, 108, 15, EYE);
+    sm->fillCircle(143, 108, 15, EYE);
+    sm->fillCircle(97, 108, 6, TFT_BLACK);
+    sm->fillCircle(143, 108, 6, TFT_BLACK);
+    sm->fillCircle(93, 104, 3, TFT_WHITE);
+    sm->fillCircle(139, 104, 3, TFT_WHITE);
+
+    // Mouth grille
+    sm->fillRect(90, 140, 60, 16, DARK);
+    sm->drawLine(105, 140, 105, 156, TFT_BLACK);
+    sm->drawLine(120, 140, 120, 156, TFT_BLACK);
+    sm->drawLine(135, 140, 135, 156, TFT_BLACK);
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -144,9 +182,7 @@ void setup() {
     sm->drawCentreString("version: " FW_VERSION, ScreenCenterX, ScreenCenterY + 45, 14);
 
     sm->selectScreen(2);
-
-    TJpgDec.setJpgScale(1);
-    TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
+    drawBootRobot(sm);
 
     widgetSet = new WidgetSet(sm);
 
