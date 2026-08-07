@@ -93,6 +93,20 @@ static const char INDEX_HTML[] PROGMEM = R"HTML(
   </div>
 
   <div class="card">
+    <h2>Custom widget</h2>
+    <label>Title</label>
+    <input type="text" id="cTitle" placeholder="Custom">
+    <label style="margin-top:12px">Static text (leave blank if using a URL below)</label>
+    <input type="text" id="cText" placeholder="Hello from the orbs!">
+    <label style="margin-top:12px">Or fetch from URL (overrides text)</label>
+    <input type="text" id="cUrl" placeholder="https://api.example.com/value">
+    <label style="margin-top:12px">JSON field (dot path, optional - e.g. data.amount)</label>
+    <input type="text" id="cField" placeholder="leave blank to show raw response">
+    <button class="save" onclick="saveCustom()">Save &amp; apply</button>
+    <div id="customMsg" style="margin-top:8px;color:#3fb950;font-size:.85rem;"></div>
+  </div>
+
+  <div class="card">
     <h2>Firmware update (OTA)</h2>
     <label>Upload a new firmware .bin to flash over WiFi (no USB needed)</label>
     <input type="file" id="fwFile" accept=".bin">
@@ -131,7 +145,26 @@ function loadSettings(){
     document.getElementById('sStocks').value = d.stocks;
     document.getElementById('sTz').value = d.timezone;
     document.getElementById('sFmt24').checked = d.format24;
+    document.getElementById('cTitle').value = d.customTitle;
+    document.getElementById('cText').value = d.customText;
+    document.getElementById('cUrl').value = d.customUrl;
+    document.getElementById('cField').value = d.customField;
   }).catch(()=>{});
+}
+function saveCustom(){
+  var body = new URLSearchParams();
+  body.set('customTitle', document.getElementById('cTitle').value);
+  body.set('customText', document.getElementById('cText').value);
+  body.set('customUrl', document.getElementById('cUrl').value);
+  body.set('customField', document.getElementById('cField').value);
+  var msg = document.getElementById('customMsg');
+  msg.textContent = 'Saving & refreshing...';
+  fetch('/api/settings',{method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:body.toString()})
+    .then(r=>r.json()).then(()=>{ msg.textContent='Saved. Switch to the "Custom" widget to see it.';
+      setTimeout(function(){msg.textContent='';}, 5000); })
+    .catch(()=>{ msg.textContent='Save failed - try again.'; });
 }
 function saveSettings(){
   var body = new URLSearchParams();
@@ -323,7 +356,11 @@ void WebPortal::handleGetSettings() {
     json += "\"metric\":" + String(settings.getMetric() ? "true" : "false") + ",";
     json += "\"stocks\":\"" + jsonEscape(settings.getStockList()) + "\",";
     json += "\"timezone\":\"" + jsonEscape(settings.getTimezoneLocation()) + "\",";
-    json += "\"format24\":" + String(settings.getFormat24Hour() ? "true" : "false");
+    json += "\"format24\":" + String(settings.getFormat24Hour() ? "true" : "false") + ",";
+    json += "\"customTitle\":\"" + jsonEscape(settings.getCustomTitle()) + "\",";
+    json += "\"customText\":\"" + jsonEscape(settings.getCustomText()) + "\",";
+    json += "\"customUrl\":\"" + jsonEscape(settings.getCustomUrl()) + "\",";
+    json += "\"customField\":\"" + jsonEscape(settings.getCustomField()) + "\"";
     json += "}";
     m_server.send(200, "application/json", json);
 }
@@ -343,6 +380,18 @@ void WebPortal::handleSaveSettings() {
     }
     if (m_server.hasArg("format24")) {
         settings.setFormat24Hour(m_server.arg("format24") == "true");
+    }
+    if (m_server.hasArg("customTitle")) {
+        settings.setCustomTitle(m_server.arg("customTitle"));
+    }
+    if (m_server.hasArg("customText")) {
+        settings.setCustomText(m_server.arg("customText"));
+    }
+    if (m_server.hasArg("customUrl")) {
+        settings.setCustomUrl(m_server.arg("customUrl"));
+    }
+    if (m_server.hasArg("customField")) {
+        settings.setCustomField(m_server.arg("customField"));
     }
     notifyChanged();
     m_server.send(200, "application/json", "{\"ok\":true}");

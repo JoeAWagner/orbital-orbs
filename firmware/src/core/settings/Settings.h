@@ -35,6 +35,17 @@ public:
     bool getFormat24Hour();
     void setFormat24Hour(bool format24Hour);
 
+    // Custom widget: a title plus EITHER static text OR a URL to fetch. If a URL
+    // is set, an optional dot-path JSON field extracts one value from the response.
+    String getCustomTitle();
+    void setCustomTitle(const String &v);
+    String getCustomText();
+    void setCustomText(const String &v);
+    String getCustomUrl();
+    void setCustomUrl(const String &v);
+    String getCustomField();
+    void setCustomField(const String &v);
+
 private:
     Preferences m_prefs;
 };

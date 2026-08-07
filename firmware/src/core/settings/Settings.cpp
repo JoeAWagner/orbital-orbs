@@ -94,3 +94,35 @@ bool Settings::getFormat24Hour() {
 void Settings::setFormat24Hour(bool format24Hour) {
     m_prefs.putBool("fmt24", format24Hour);
 }
+
+String Settings::getCustomTitle() {
+    return m_prefs.getString("custTitle", "Custom");
+}
+
+void Settings::setCustomTitle(const String &v) {
+    m_prefs.putString("custTitle", v);
+}
+
+String Settings::getCustomText() {
+    return m_prefs.getString("custText", "");
+}
+
+void Settings::setCustomText(const String &v) {
+    m_prefs.putString("custText", v);
+}
+
+String Settings::getCustomUrl() {
+    return m_prefs.getString("custUrl", "");
+}
+
+void Settings::setCustomUrl(const String &v) {
+    m_prefs.putString("custUrl", v);
+}
+
+String Settings::getCustomField() {
+    return m_prefs.getString("custField", "");
+}
+
+void Settings::setCustomField(const String &v) {
+    m_prefs.putString("custField", v);
+}
