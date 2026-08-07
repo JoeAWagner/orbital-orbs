@@ -1,0 +1,31 @@
+# macOS system files
+.DS_Store
+
+# Compiled binary files and executables
+*.o
+*.elf
+*.hex
+*.exe
+*.out
+
+# Build directory and Arduino IDE specific files
+/build/
+*.d
+
+# Arduino libraries (if installed in the project directory)
+libraries/
+firmware/config/config.h
+.pio
+
+# VS Code
+.vscode/
+
+# Jetbrains IDE
+.idea/
+
+megalinter-reports/
+
+# May be present if running mega-linter-runner locally
+node_modules
+package.json
+package-lock.json
